@@ -1,4 +1,6 @@
 notebook.cfg
 *.csv
 *.bnn
+*.xml
+
 .ipynb_checkpoints/
