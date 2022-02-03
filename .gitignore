@@ -1,0 +1,4 @@
+notebook.cfg
+*.csv
+*.bnn
+.ipynb_checkpoints/
