@@ -21,7 +21,7 @@ def get_data_from_file(filename):
 
 def get_df_from_csv(filename):
     df = pandas.read_csv(os.path.join(sys.path[0], LOCAL_FILE_PATH, filename), sep=';', encoding='CP850', skiprows=[0], header=None, usecols=columns_to_import, names=columns_to_import_names, dtype={'Indeks': 'str'})
-    print(f"File: {os.path.join(sys.path[0], LOCAL_FILE_PATH, filename)}, original lines: {len(df.index)}")
+    # print(f"File: {os.path.join(sys.path[0], LOCAL_FILE_PATH, filename)}, original lines: {len(df.index)}")
     return df
 
 
@@ -47,7 +47,7 @@ def fetch_hurt_data():
 
     products_from_hurt = pandas.concat([vege_hurt_cleared, fresh_hurt_cleared, food_hurt_cleared])
 
-    print(products_from_hurt)
+    # print(products_from_hurt)
 
     return products_from_hurt
 

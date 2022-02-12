@@ -1,31 +1,49 @@
+import product_updater
 import shop_connector
 from constants import SHOP_PRODUCTS_URL
 import xml_util
 
 
-def process_products():
-    for product in shop_connector.get_product_list():
-        # print(elem)
+def process_products(hurt_all_products):
+    for idx, product in enumerate(shop_connector.get_product_list()):
+        print(idx, end=',')
         product_id = product.attrib['id']
         product_url = product.get("{http://www.w3.org/1999/xlink}href")
-        print(f"Id: {product_id}, URL: {product_url}")
-        # process_product(product_url)
+        # print(f"Id: {product_id}, URL: {product_url}")
+        process_product(product_url, hurt_all_products)
 
 
-def process_product(product_url):
-    product_details = shop_connector.get_product_details(product_url)
+def get_hurt_product(shop_product_details, hurt_all_products):
+    product_index = xml_util.parse_product_index(shop_product_details)
+    hurt_product_by_index = hurt_all_products[hurt_all_products['Indeks'].isin([product_index])]
+    print(f"Hurt product: {hurt_product_by_index}")
+    return hurt_product_by_index
 
-    if product_to_process(product_details):
 
-        
-        product_details = update_product_details(product_details)
-        shop_connector.save_product(product_url, product_details)
+def process_product(product_url, hurt_all_products):
+    shop_product_details = shop_connector.get_product_details(product_url)
+
+    if product_to_process(shop_product_details, hurt_all_products):
+
+        hurt_product = get_hurt_product(shop_product_details, hurt_all_products)
+        print(f"Update product with Indeks: {xml_util.parse_product_index(shop_product_details)}")
+        shop_product_details = update_product_details(shop_product_details, hurt_product)
+        # shop_connector.save_product(product_url, shop_product_details)
+        return
     else:
+        # print(f"Product {xml_util.parse_product_index(shop_product_details)} not in hurt")
+
         return
 
 
-def product_to_process(product_details):
-    return index_to_process(product_details) and category_to_process(product_details)
+def shop_product_in_hurt(product_details, hurt_all_products):
+    shop_product_exists_in_hurt = xml_util.parse_product_index(product_details) in hurt_all_products.Indeks.values
+    # print(shop_product_exists_in_hurt)
+    return shop_product_exists_in_hurt
+
+
+def product_to_process(product_details, hurt_all_products):
+    return index_to_process(product_details) and category_to_process(product_details) and shop_product_in_hurt(product_details, hurt_all_products)
 
 
 def index_to_process(product_details):
@@ -46,9 +64,24 @@ def get_category_name(category_url):
     return category_name
 
 
-def update_product_details(product_details):
-    product_node = product_details.find('*')
+def update_product_details(shop_product_details, hurt_product):
+
+    # what to update?
+
+    # price
+    # curr = CurrencyRates()
+    # euroPlnRate = curr.get_rate('EUR', 'PLN')
+    # print(f"Euro price: {euroPlnRate}")
+    # df['PricePLN'] = (df['Price'].apply(convertToFloat)*priceWithMargin*euroPlnRate).apply(lambda x : format(x, '.2f'))
+    price_pln = product_updater.calculate_new_price(hurt_product.Price.iloc[0])
+    # active =    df['Show'] = df['Change'].isin(['N','A','W']).apply(int)
+
+    # wielosztuki - jak?
+
+
+
+    product_node = shop_product_details.find('*')
     print(product_node.find('name').find('language').text)
-    product_details.find('*').find('name').find('language').text = "nowy name 6"
+    shop_product_details.find('*').find('name').find('language').text = "nowy name 6"
     print(product_node.find('name').find('language').text)
-    return product_details
+    return shop_product_details

@@ -7,13 +7,18 @@ from product_processor import process_products, process_product
 
 
 def main():
-    print("Hello World!")
     # print(sys.path[0])
-    fetch_hurt_data()
+    hurt_all_products = fetch_hurt_data()
 
-    # process_products()
+    # process_products(hurt_all_products)
+
+
+
+
     # test_product_url = SHOP_PRODUCTS_URL + "/1137"
-    # process_product(test_product_url)
+
+    test_product_url = SHOP_PRODUCTS_URL + "/9604" # indeks 719086
+    process_product(test_product_url, hurt_all_products)
 
 
 if __name__ == "__main__":

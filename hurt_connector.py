@@ -10,8 +10,8 @@ def fetch_file_from_hurt_ftp(filename):
     # ftp_server.dir()
     ftp_server.encoding = 'CP850'
 
-    print(filename)
-    print(os.path.join(sys.path[0], LOCAL_FILE_PATH, filename))
+    # print(filename)
+    # print(os.path.join(sys.path[0], LOCAL_FILE_PATH, filename))
     with open(os.path.join(sys.path[0], LOCAL_FILE_PATH, filename), "wb") as file:
         ftp_server.retrbinary(f"RETR {filename}", file.write)
 
