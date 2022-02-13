@@ -66,20 +66,15 @@ def get_category_name(category_url):
 
 def update_product_details(shop_product_details, hurt_product):
 
-    # what to update?
+    price_pln = product_updater.calculate_new_price(hurt_product)
+    is_product_active = product_updater.get_product_active(hurt_product)
+    multi_item = product_updater.get_multi_items(hurt_product)
 
-    # price
-    # curr = CurrencyRates()
-    # euroPlnRate = curr.get_rate('EUR', 'PLN')
-    # print(f"Euro price: {euroPlnRate}")
-    # df['PricePLN'] = (df['Price'].apply(convertToFloat)*priceWithMargin*euroPlnRate).apply(lambda x : format(x, '.2f'))
-    price_pln = product_updater.calculate_new_price(hurt_product.Price.iloc[0])
-    # active =    df['Show'] = df['Change'].isin(['N','A','W']).apply(int)
-
-    # wielosztuki - jak?
+    # need to POST new specific_prices with from_quantity and reduction and id_product and price -1 and reduction_type
+    # xml_util.
 
 
-
+    print(f"Old: price: {}")
     product_node = shop_product_details.find('*')
     print(product_node.find('name').find('language').text)
     shop_product_details.find('*').find('name').find('language').text = "nowy name 6"
