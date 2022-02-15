@@ -2,5 +2,5 @@ notebook.cfg
 *.csv
 *.bnn
 *.xml
-
+*.log
 .ipynb_checkpoints/
