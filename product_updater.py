@@ -1,6 +1,8 @@
 from forex_python.converter import CurrencyRates
-
+import logging
 import hurt_product_util
+
+logger = logging.getLogger(__name__)
 
 price_with_margin = 1.5
 euro_pln_rate = None
@@ -9,11 +11,11 @@ price_with_discount = 1-discount
 
 
 def fetch_euro_currency():
-    print("fetching euro/pln rate...")
+    logger.info("fetching euro/pln rate...")
     currency_rates = CurrencyRates()
     global euro_pln_rate
     euro_pln_rate = currency_rates.get_rate('EUR', 'PLN')
-    print(f"Euro price: {euro_pln_rate}")
+    logger.info('Euro price: %s', euro_pln_rate)
     # df['PricePLN'] = (df['Price'].apply(convertToFloat)*price_with_margin*euroPlnRate).apply(lambda x : format(x, '.2f'))
     return euro_pln_rate
 
@@ -24,14 +26,13 @@ def calculate_new_price(hurt_product):
 
     hurt_price_eur = hurt_product_util.get_product_price(hurt_product)
     new_price_pln = hurt_price_eur * price_with_margin * euro_pln_rate
-    print(f"Price in EUR: {hurt_price_eur}, price in PLN: {new_price_pln}")
-
+    logger.info("Price in EUR: %s, price in PLN: %s", hurt_price_eur, new_price_pln)
     return round(new_price_pln, 2)
 
 
 def get_product_active(hurt_product):
     is_active = hurt_product.Change.iloc[0] in ['N', 'A', 'W']
-    print(f"Product active?: {is_active}")
+    # print(f"Product active?: {is_active}")
     return is_active
 
 

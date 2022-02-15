@@ -21,3 +21,21 @@ def remove_node(product_details, node_name):
 
     node = product_node.find(node_name)
     product_node.remove(node)
+
+
+def parse_product_price(product_details):
+    return product_details.find('*').find('price').text
+
+
+def update_price(shop_product_details, price_pln):
+    product_node = shop_product_details.find('*')
+    # print(product_node.find('price').text)
+    product_node.find('price').text = str(price_pln)
+    # print(product_node.find('price').text)
+
+
+def update_is_active(shop_product_details, is_active):
+    product_node = shop_product_details.find('*')
+    # print(product_node.find('active').text)
+    product_node.find('active').text = str(int(is_active is True))
+    # print(product_node.find('active').text)
