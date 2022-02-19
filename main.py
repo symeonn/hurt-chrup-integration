@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from hurt_processor import fetch_hurt_data
 from product_processor import process_products
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s [%(filename)s:%(lineno)s ] %(levelname)s: %(message)s"
 
 logging.basicConfig(filename='logs/example.log', format=FORMAT, encoding='utf-8', level=logging.INFO)
-logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))  # comment to log to file, uncomment to log to console
+# logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))  # comment to log to file, uncomment to log to console
 
 
 def init_application():
