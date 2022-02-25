@@ -1,7 +1,10 @@
+import os
 from configparser import ConfigParser
 
+CONFIG_FILE_PATH = os.path.join(os.path.dirname(__file__), 'notebook.cfg')
+
 parser = ConfigParser()
-_ = parser.read('notebook.cfg')
+_ = parser.read(CONFIG_FILE_PATH)
 
 LOCAL_FILE_PATH = parser['general']['LOCAL_FILE_PATH']
 
