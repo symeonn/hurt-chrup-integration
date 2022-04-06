@@ -31,15 +31,12 @@ def filter_indeks_digit_only(df):
 
 def fetch_hurt_data():
     vege_hurt_cleared = filter_indeks_digit_only(get_data_from_file(FRUITS_AND_VEGES_FILENAME))
-    # vegeBnnShop = filterInByIndeks(vege_hurt_cleared, shopIndeksNoNullCleared)
     logger.info('File: %s, Shop lines: %s', FRUITS_AND_VEGES_FILENAME, len(vege_hurt_cleared.index))
 
     fresh_hurt_cleared = filter_indeks_digit_only(get_data_from_file(FRESH_FILENAME))
-    # freshBnnShop = filterInByIndeks(fresh_hurt_cleared, shopIndeksNoNullCleared)
     logger.info('File: %s, Shop lines: %s', FRESH_FILENAME, len(fresh_hurt_cleared.index))
 
     food_hurt_cleared = filter_indeks_digit_only(get_data_from_file(FOOD_FILENAME))
-    # dryBnnShop = filterInByIndeks(food_hurt_cleared, shopIndeksNoNullCleared)
     logger.info('File: %s, Shop lines: %s', FOOD_FILENAME, len(food_hurt_cleared.index))
 
     products_from_hurt = pandas.concat([vege_hurt_cleared, fresh_hurt_cleared, food_hurt_cleared])

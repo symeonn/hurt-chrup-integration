@@ -12,18 +12,18 @@ logger = logging.getLogger(__name__)
 def process_products(hurt_all_products):
     a_pool = multiprocessing.Pool()
     logger.info('Number of processes: %s', a_pool._processes)
+    shop_all_products = shop_connector.get_product_list()
+    return a_pool.starmap(process, zip(shop_all_products, repeat(hurt_all_products)))
 
-    a_pool.starmap(process, zip(shop_connector.get_product_list(), repeat(hurt_all_products)))
 
-
-def process(product, hurt_all_products):
-    product_id = product.attrib['id']
+def process(shop_product, hurt_all_products):
+    product_id = shop_product.attrib['id']
     print(product_id, end=',')
 
-    product_url = product.get("{http://www.w3.org/1999/xlink}href")
+    product_url = shop_product.get("{http://www.w3.org/1999/xlink}href")
     # print(f"Id: {product_id}, URL: {product_url}")
 
-    process_product(product_url, hurt_all_products)
+    return process_product(product_url, hurt_all_products)
 
 
 def get_hurt_product(shop_product_details, hurt_all_products):
@@ -32,17 +32,28 @@ def get_hurt_product(shop_product_details, hurt_all_products):
     return hurt_product_by_index
 
 
-def process_product(product_url, hurt_all_products):
-    shop_product_details = shop_connector.get_product_details(product_url)
+def remove_product(product_list, product_to_remove):
+    product_index = xml_util.parse_product_index(product_to_remove)
+
+    return product_list.drop(product_list.index[product_list['Indeks'] == product_index])
+
+
+def process_product(shop_product_url, hurt_all_products):
+    shop_product_details = shop_connector.get_product_details(shop_product_url)
 
     if product_to_process(shop_product_details, hurt_all_products):
 
-        hurt_product = get_hurt_product(shop_product_details, hurt_all_products)
-        shop_product_details = update_product_details(shop_product_details, hurt_product)
-        shop_connector.save_product(product_url, shop_product_details)
-        return
+        if not is_category_import(shop_product_details):
+            hurt_product = get_hurt_product(shop_product_details, hurt_all_products)
+            shop_product_details = update_product_details(shop_product_details, hurt_product)
+            shop_connector.save_product(shop_product_url, shop_product_details)
+
+        # hurt_all_products = remove_product(hurt_all_products, shop_product_details)
+
+        return xml_util.parse_product_index(shop_product_details)
+
     else:
-        return
+        return -1
 
 
 def shop_product_in_hurt(product_details, hurt_all_products):
@@ -51,9 +62,7 @@ def shop_product_in_hurt(product_details, hurt_all_products):
 
 
 def product_to_process(product_details, hurt_all_products):
-    return index_to_process(product_details) \
-           and category_to_process(product_details) \
-           and shop_product_in_hurt(product_details, hurt_all_products)
+    return index_to_process(product_details) and shop_product_in_hurt(product_details, hurt_all_products)
 
 
 def index_to_process(product_details):
@@ -61,15 +70,9 @@ def index_to_process(product_details):
     return index is not None and index.isnumeric()
 
 
-def category_to_process(product_details):
+def is_category_import(product_details):
     category_url = xml_util.parse_category_url(product_details)
-    return "imp" != get_category_name(category_url)
-
-
-def get_category_name(category_url):
-    category_xml_string = shop_connector.make_get_request(category_url)
-    category_name = xml_util.parse_category_name(category_xml_string)
-    return category_name
+    return category_url.endswith("/118")
 
 
 def update_product_details(shop_product_details, hurt_product):

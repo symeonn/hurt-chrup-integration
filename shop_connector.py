@@ -10,6 +10,9 @@ from constants import SHOP_PRODUCTS_URL, SHOP_API_TOKEN
 
 def make_get_request(url):
     response = requests.get(url, headers=get_headers())
+
+    # logging.info("GET URL: %s, size: %s", url, len(response.text))
+
     return response.text
 
 
@@ -26,6 +29,9 @@ def get_headers():
 
 def make_put_request(url, payload):
     response = requests.put(url, payload, headers=get_headers())
+
+    # logging.info("PUT URL: %s, RQ size: %s, RS size: %s", url, len(payload.text), len(response.text))
+
     return response
 
 
@@ -49,4 +55,4 @@ def save_product(product_url, product_details):
     response = make_put_request(product_url, xml_to_update)
 
     if response.status_code != 200:
-        logging.warning("Problem updating product: XML: $s, response: %s", xml_to_update, response.text)
+        logging.warning("Problem updating product: XML: %s, response: %s", xml_to_update, response.text)
