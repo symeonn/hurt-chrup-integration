@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import sys
@@ -24,6 +25,8 @@ def main():
     init_application()
 
     logger.info('======================Start sync======================')
+    start_time = datetime.datetime.now()
+    logger.info('Started at: ' + str(start_time))
 
     hurt_all_products = fetch_hurt_data()
     indexes_processed = process_products(hurt_all_products)
@@ -32,6 +35,9 @@ def main():
     new_products_to_csv(hurt_all_products, indexes_processed)
 
     logger.info('\n======================End sync======================')
+    end_time = datetime.datetime.now()
+    logger.info('Finished at: ' + str(end_time))
+    logger.info('Time elapsed: ' + str(end_time - start_time))
 
 
 def new_products_to_csv(hurt_all_products, indexes_processed):

@@ -15,6 +15,9 @@ def process_products(hurt_all_products):
     shop_all_products = shop_connector.get_product_list()
     return a_pool.starmap(process, zip(shop_all_products, repeat(hurt_all_products)))
 
+    # for shop_product in shop_all_products:
+    #     process(shop_product, hurt_all_products)
+
 
 def process(shop_product, hurt_all_products):
     product_id = shop_product.attrib['id']
