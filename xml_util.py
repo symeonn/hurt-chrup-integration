@@ -24,7 +24,8 @@ def remove_node(product_details, node_name):
 
 
 def parse_product_price(product_details):
-    return product_details.find('*').find('price').text
+    product_price_text = product_details.find('*').find('price').text
+    return float(product_price_text.replace(',', '.'))
 
 
 def update_price(shop_product_details, price_pln):

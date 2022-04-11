@@ -7,11 +7,10 @@ from constants import LOCAL_FILE_PATH
 from hurt_processor import fetch_hurt_data
 from product_processor import process_products
 from product_updater import fetch_euro_currency
-from translator import translate_de_to_pl
 
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(levelname)s: %(message)s"
-LOG_FILE_PATH = os.path.join(os.path.dirname(__file__), 'logs', 'main1.log')
+LOG_FILE_PATH = os.path.join(os.path.dirname(__file__), 'logs', 'main.log')
 
 logging.basicConfig(filename=LOG_FILE_PATH, format=FORMAT, encoding='utf-8', level=logging.INFO)
 # logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))  # comment to log to file, uncomment to log to console

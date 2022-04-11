@@ -2,6 +2,7 @@ import logging
 import multiprocessing
 from itertools import repeat
 
+import hurt_product_util
 import product_updater
 import shop_connector
 import xml_util
@@ -79,19 +80,26 @@ def is_category_import(product_details):
 
 
 def update_product_details(shop_product_details, hurt_product):
-    price_pln = product_updater.calculate_new_price(hurt_product)
+    new_price_pln = product_updater.calculate_new_price(hurt_product)
     is_product_active = product_updater.get_product_active(hurt_product)
-    # multi_item = product_updater.get_multi_items(hurt_product)
+    quantity = hurt_product_util.get_product_quantity(hurt_product)
+    multi_item_price = product_updater.get_multi_items_price(hurt_product)
+    # get all s_p for product with specific_prices?display=full&filter[id_product]=1137
+    # remove all specific_prices for this product
+    # need to POST new specific_prices with from_quantity [quantity] and reduction [0.1 (10%)] and id_product and price [-1] and reduction_type [percentage]
+    # do I need to post new s_p when price is changed or only when quantity is changed?
+    # I can update (and even should) s_p for product
 
-    # need to POST new specific_prices with from_quantity and reduction and id_product and price -1 and reduction_type
-    # xml_util.
-    logger.info("Update: Indeks: %s, Old price: %s, New price: %s, Is active: %s ",
+    logger.info("Update: Indeks: %s, Old price: %s, New price: %s, Active: %s, Quantity: %s, Multi price: %s",
                 xml_util.parse_product_index(shop_product_details),
-                xml_util.parse_product_price(shop_product_details),
-                price_pln,
-                is_product_active)
+                round(xml_util.parse_product_price(shop_product_details), 2),
+                new_price_pln,
+                is_product_active,
+                quantity,
+                multi_item_price)
 
-    xml_util.update_price(shop_product_details, price_pln)
+    xml_util.update_price(shop_product_details, new_price_pln)
     xml_util.update_is_active(shop_product_details, is_product_active)
+    # xml_util.update_multi_items(shop_product_details, multi_item)
 
     return shop_product_details
