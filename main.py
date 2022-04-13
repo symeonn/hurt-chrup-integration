@@ -6,7 +6,7 @@ import sys
 from constants import LOCAL_FILE_PATH
 from hurt_processor import fetch_hurt_data
 from product_processor import process_products
-from product_updater import fetch_euro_currency
+from product_updater import fetch_euro_currency, euro_pln_rate
 
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(levelname)s: %(message)s"
@@ -37,6 +37,7 @@ def main():
     end_time = datetime.datetime.now()
     logger.info('Finished at: ' + str(end_time))
     logger.info('Time elapsed: ' + str(end_time - start_time))
+    logger.info('Euro price: %s', euro_pln_rate)
 
 
 def new_products_to_csv(hurt_all_products, indexes_processed):
