@@ -9,4 +9,4 @@ def get_product_quantity(hurt_product):
     quantity_string = hurt_product.Quantity.iloc[0]
     quantity = float(quantity_string.replace(',', '.'))
     # print(f"Quantity: {quantity}")
-    return quantity
+    return int(quantity)

@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ElementTree
 import requests
 
 import xml_util
-from constants import SHOP_PRODUCTS_URL, SHOP_API_TOKEN
+from constants import SHOP_PRODUCTS_URL, SHOP_API_TOKEN, SHOP_SPECIFIC_PRICES_URL
 
 
 def make_get_request(url):
@@ -35,10 +35,27 @@ def make_put_request(url, payload):
     return response
 
 
+def make_post_request(url, payload):
+    response = requests.post(url, payload, headers=get_headers())
+
+    # logging.info("PUT URL: %s, RQ size: %s, RS size: %s", url, len(payload.text), len(response.text))
+
+    return response
+
+
 def get_product_details(product_url):
     product_details_xml_string = make_get_request(product_url)
     # print(ET.fromstring(product_details_xml_string)[0])
     return ElementTree.ElementTree(ElementTree.fromstring(product_details_xml_string))
+
+
+def get_product_specific_prices(product_id):
+
+    product_specific_prices_xml_string = make_get_request(SHOP_SPECIFIC_PRICES_URL + "/?display=full&filter[id_product]=" + product_id)
+
+    print(product_specific_prices_xml_string)
+
+    return ElementTree.ElementTree(ElementTree.fromstring(product_specific_prices_xml_string))
 
 
 def clear_product_xml_for_saving(product_details):
@@ -47,7 +64,7 @@ def clear_product_xml_for_saving(product_details):
     return product_details
 
 
-def save_product(product_url, product_details):
+def update_product(product_url, product_details):
     product_ready_to_save = clear_product_xml_for_saving(product_details)
 
     xml_to_update = ElementTree.tostring(product_ready_to_save.getroot(), encoding='utf8', method='xml')
@@ -56,3 +73,23 @@ def save_product(product_url, product_details):
 
     if response.status_code != 200:
         logging.warning("Problem updating product: XML: %s, response: %s", xml_to_update, response.text)
+
+
+def save_specific_price(xml):
+    xml_to_save = ElementTree.tostring(xml, encoding='utf8', method='xml')
+
+    make_post_request(SHOP_SPECIFIC_PRICES_URL, xml_to_save)
+
+
+def save_new_specific_price(product_id, reduction, quantity):
+    print("new specific price")
+    xml = xml_util.get_new_specific_price(reduction, quantity, product_id)
+
+    save_specific_price(xml)
+
+
+def update_specific_price(specific_price):
+    url = SHOP_SPECIFIC_PRICES_URL + "/" + specific_price.find("id").text
+    xml_to_update = ElementTree.tostring(specific_price, encoding='utf8', method='xml')
+
+    make_put_request(url, xml_to_update)

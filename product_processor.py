@@ -50,7 +50,7 @@ def process_product(shop_product_url, hurt_all_products):
         if not is_category_import(shop_product_details):
             hurt_product = get_hurt_product(shop_product_details, hurt_all_products)
             shop_product_details = update_product_details(shop_product_details, hurt_product)
-            shop_connector.save_product(shop_product_url, shop_product_details)
+            shop_connector.update_product(shop_product_url, shop_product_details)
 
         # hurt_all_products = remove_product(hurt_all_products, shop_product_details)
 
@@ -84,11 +84,8 @@ def update_product_details(shop_product_details, hurt_product):
     is_product_active = product_updater.get_product_active(hurt_product)
     quantity = hurt_product_util.get_product_quantity(hurt_product)
     multi_item_price = product_updater.get_multi_items_price(hurt_product)
-    # get all s_p for product with specific_prices?display=full&filter[id_product]=1137
-    # remove all specific_prices for this product
-    # need to POST new specific_prices with from_quantity [quantity] and reduction [0.1 (10%)] and id_product and price [-1] and reduction_type [percentage]
-    # do I need to post new s_p when price is changed or only when quantity is changed?
-    # I can update (and even should) s_p for product
+
+    # process_multi_item(shop_product_details, quantity)
 
     logger.info("Update: Indeks: %s, Old price: %s, New price: %s, Active: %s, Quantity: %s, Multi price: %s",
                 xml_util.parse_product_index(shop_product_details),
@@ -103,3 +100,40 @@ def update_product_details(shop_product_details, hurt_product):
     # xml_util.update_multi_items(shop_product_details, multi_item)
 
     return shop_product_details
+
+
+def process_multi_item(shop_product_details, quantity):
+    # get all s_p for product with specific_prices?display=full&filter[id_product]=1137
+
+    shop_product_id = xml_util.parse_product_id(shop_product_details)
+    el = shop_connector.get_product_specific_prices(shop_product_id)
+
+    # get node list 'specific_price' from ElementTree and iterate over it
+    # for specific_price in el.findall('specific_price'):
+
+    specific_price_list = el.findall(".//specific_price")
+    reduction = 0.2
+
+    # if specific_price_list is single element get first element
+    if len(specific_price_list) == 1:
+        specific_price = specific_price_list[0]
+
+        # get reduction from specific_price
+
+        old_reduction = specific_price.find('reduction')
+        from_quantity = specific_price.find('from_quantity')
+
+        if int(from_quantity.text) != quantity or float(old_reduction.text) != reduction:
+            specific_price.find('reduction').text = str(reduction)
+            specific_price.find('from_quantity').text = str(int(quantity))
+
+            shop_connector.update_specific_price(specific_price) # not working CHECK
+    else:
+
+        # delete other specific_prices
+        shop_connector.save_new_specific_price(shop_product_id, reduction, int(quantity))
+
+    # remove all specific_prices for this product
+    # need to POST new specific_prices with from_quantity [quantity] and reduction [0.1 (10%)] and id_product and price [-1] and reduction_type [percentage]
+    # do I need to post new s_p when price is changed or only when quantity is changed?
+    # I can update (and even should) s_p for product

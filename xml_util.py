@@ -16,6 +16,10 @@ def parse_product_index(product_details):
     return product_details.find('*').find('reference').text
 
 
+def parse_product_id(product_details):
+    return product_details.find('*').find('id').text
+
+
 def remove_node(product_details, node_name):
     product_node = product_details.find('*')
 
@@ -40,3 +44,43 @@ def update_is_active(shop_product_details, is_active):
     # print(product_node.find('active').text)
     product_node.find('active').text = str(int(is_active is True))
     # print(product_node.find('active').text)
+
+
+def get_new_specific_price(reduction, from_quantity, product_id):
+
+    # create from xml string
+    specific_price_xml = ElementTree.fromstring('<prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><specific_price></specific_price></prestashop>')
+    specific_price_node = specific_price_xml.find('specific_price')
+    element = ElementTree.SubElement(specific_price_node, 'id_shop')
+    element.text = '0'
+    element = ElementTree.SubElement(specific_price_node, 'id_cart')
+    element.text = '0'
+    element = ElementTree.SubElement(specific_price_node, 'id_currency')
+    element.text = '0'
+    element = ElementTree.SubElement(specific_price_node, 'id_country')
+    element.text = '0'
+    element = ElementTree.SubElement(specific_price_node, 'id_group')
+    element.text = '0'
+    element = ElementTree.SubElement(specific_price_node, 'id_customer')
+    element.text = '0'
+    element = ElementTree.SubElement(specific_price_node, 'id_product')
+    element.text = str(product_id)
+    element.set('xlink:href', 'https://chrupnazdrowie.pl/api/products/' + str(product_id))
+
+    element = ElementTree.SubElement(specific_price_node, 'price')
+    element.text = '-1'
+    element = ElementTree.SubElement(specific_price_node, 'from_quantity')
+    element.text = str(from_quantity)
+    element = ElementTree.SubElement(specific_price_node, 'reduction')
+    element.text = str(reduction)
+    element = ElementTree.SubElement(specific_price_node, 'reduction_tax')
+    element.text = '1'
+    element = ElementTree.SubElement(specific_price_node, 'reduction_type')
+    element.text = 'percentage'
+    element = ElementTree.SubElement(specific_price_node, 'from')
+    element.text = '0000-00-00 00:00:00'
+    element = ElementTree.SubElement(specific_price_node, 'to')
+    element.text = '0000-00-00 00:00:00'
+
+    return specific_price_xml
+
