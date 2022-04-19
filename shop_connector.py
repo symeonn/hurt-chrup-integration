@@ -81,15 +81,15 @@ def save_specific_price(xml):
     make_post_request(SHOP_SPECIFIC_PRICES_URL, xml_to_save)
 
 
-def save_new_specific_price(product_id, reduction, quantity):
-    print("new specific price")
-    xml = xml_util.get_new_specific_price(reduction, quantity, product_id)
+def save_new_specific_price(reduction, quantity, product_id):
+    xml = xml_util.get_specific_price_element(reduction, quantity, product_id)
 
     save_specific_price(xml)
 
 
-def update_specific_price(specific_price):
-    url = SHOP_SPECIFIC_PRICES_URL + "/" + specific_price.find("id").text
-    xml_to_update = ElementTree.tostring(specific_price, encoding='utf8', method='xml')
+def update_specific_price(reduction, quantity, product_id, specific_price_id):
+    url = SHOP_SPECIFIC_PRICES_URL + "/" + specific_price_id
+    xml = xml_util.get_specific_price_element(reduction, quantity, product_id, specific_price_id)
+    xml_to_update = ElementTree.tostring(xml, encoding='utf8', method='xml')
 
     make_put_request(url, xml_to_update)

@@ -6,6 +6,7 @@ import hurt_product_util
 import product_updater
 import shop_connector
 import xml_util
+from constants import MULTI_ITEM_PRICE_REDUCTION
 
 logger = logging.getLogger(__name__)
 
@@ -103,37 +104,23 @@ def update_product_details(shop_product_details, hurt_product):
 
 
 def process_multi_item(shop_product_details, quantity):
-    # get all s_p for product with specific_prices?display=full&filter[id_product]=1137
-
     shop_product_id = xml_util.parse_product_id(shop_product_details)
     el = shop_connector.get_product_specific_prices(shop_product_id)
-
-    # get node list 'specific_price' from ElementTree and iterate over it
-    # for specific_price in el.findall('specific_price'):
-
     specific_price_list = el.findall(".//specific_price")
-    reduction = 0.2
 
-    # if specific_price_list is single element get first element
     if len(specific_price_list) == 1:
         specific_price = specific_price_list[0]
-
-        # get reduction from specific_price
 
         old_reduction = specific_price.find('reduction')
         from_quantity = specific_price.find('from_quantity')
 
-        if int(from_quantity.text) != quantity or float(old_reduction.text) != reduction:
-            specific_price.find('reduction').text = str(reduction)
-            specific_price.find('from_quantity').text = str(int(quantity))
-
-            shop_connector.update_specific_price(specific_price) # not working CHECK
+        if has_quantity_or_reduction_changed(from_quantity, old_reduction, quantity, MULTI_ITEM_PRICE_REDUCTION):
+            specific_price_id = specific_price.find("id").text
+            shop_connector.update_specific_price(MULTI_ITEM_PRICE_REDUCTION, quantity, shop_product_id, specific_price_id)
     else:
-
         # delete other specific_prices
-        shop_connector.save_new_specific_price(shop_product_id, reduction, int(quantity))
+        shop_connector.save_new_specific_price(MULTI_ITEM_PRICE_REDUCTION, quantity, shop_product_id)
 
-    # remove all specific_prices for this product
-    # need to POST new specific_prices with from_quantity [quantity] and reduction [0.1 (10%)] and id_product and price [-1] and reduction_type [percentage]
-    # do I need to post new s_p when price is changed or only when quantity is changed?
-    # I can update (and even should) s_p for product
+
+def has_quantity_or_reduction_changed(from_quantity, old_reduction, quantity, reduction):
+    return int(from_quantity.text) != quantity or float(old_reduction.text) != reduction
