@@ -86,7 +86,7 @@ def update_product_details(shop_product_details, hurt_product):
     quantity = hurt_product_util.get_product_quantity(hurt_product)
     multi_item_price = product_updater.get_multi_items_price(hurt_product)
 
-    # process_multi_item(shop_product_details, quantity)
+    process_multi_item(shop_product_details, quantity)
 
     logger.info("Update: Indeks: %s, Old price: %s, New price: %s, Active: %s, Quantity: %s, Multi price: %s",
                 xml_util.parse_product_index(shop_product_details),
@@ -98,7 +98,6 @@ def update_product_details(shop_product_details, hurt_product):
 
     xml_util.update_price(shop_product_details, new_price_pln)
     xml_util.update_is_active(shop_product_details, is_product_active)
-    # xml_util.update_multi_items(shop_product_details, multi_item)
 
     return shop_product_details
 

@@ -6,7 +6,7 @@ import sys
 from constants import LOCAL_FILE_PATH
 from hurt_processor import fetch_hurt_data
 from product_processor import process_products
-from product_updater import fetch_euro_currency, euro_pln_rate
+from product_updater import fetch_euro_currency
 
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(levelname)s: %(message)s"
@@ -16,12 +16,8 @@ logging.basicConfig(filename=LOG_FILE_PATH, format=FORMAT, encoding='utf-8', lev
 # logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))  # comment to log to file, uncomment to log to console
 
 
-def init_application():
-    fetch_euro_currency()
-
-
 def main():
-    init_application()
+    euro_pln_rate = fetch_euro_currency()
 
     logger.info('======================Start sync======================')
     start_time = datetime.datetime.now()
